@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  registry:
+    image: openjdk:17
+    container_name: rmi-registry
+    command: rmiregistry
+    working_dir: /app
+    volumes:
+      - ./interfaceCode:/app
+    networks:
+      - rmi-net
+
+  server:
+    build:
+      context: ./serverCode
+    container_name: rmi-server
+    working_dir: /app/serverCode
+    volumes:
+      - ./serverCode:/app/serverCode
+      - ./interfaceCode:/app/interfaceCode
+    command: ["bash", "entrypoint.sh"]
+    depends_on:
+      - registry
+    networks:
+      - rmi-net
+
+  client:
+    build:
+      context: ./clientCode
+    container_name: rmi-client
+    working_dir: /app/clientCode
+    volumes:
+      - ./clientCode:/app/clientCode
+      - ./interfaceCode:/app/interfaceCode
+    command: ["bash", "/app/entrypoint.sh"]
+    depends_on:
+      - server
+    networks:
+      - rmi-net
+
+networks:
+  rmi-net:
