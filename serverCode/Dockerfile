@@ -1,11 +1,11 @@
-FROM openjdk:17
+FROM openjdk:17-jdk-slim
+
 WORKDIR /app
 
-COPY interfaceCode/ interfaceCode/
-COPY serverCode/ serverCode/
+COPY serverCode/ ./serverCode/
+COPY interfaceCode/ ./interfaceCode/
 
-RUN javac interfaceCode/MyInterface.java serverCode/*.java
+RUN javac serverCode/*.java interfaceCode/*.java
 
-EXPOSE 1099
+CMD ["java", "serverCode.Server"]
 
-CMD ["java", "-cp", ".", "serverCode.Server"]

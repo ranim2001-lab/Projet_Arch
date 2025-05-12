@@ -1,9 +1,16 @@
-FROM openjdk:17
+# Use an official OpenJDK image
+FROM openjdk:17-jdk-slim
+
+# Set the working directory
 WORKDIR /app
 
-COPY interfaceCode/ interfaceCode/
+# Copy client code and interface code
 COPY clientCode/ clientCode/
+COPY interfaceCode/ interfaceCode/
 
-RUN javac interfaceCode/ProductService.java clientCode/Client.java
+# Compile the client Java code
+RUN javac clientCode/*.java interfaceCode/*.java
 
-CMD ["java", "-cp", ".", "clientCode.Client"]
+# Command to run the client
+CMD ["java", "clientCode.Client"]
+

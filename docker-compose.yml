@@ -1,43 +1,33 @@
-version: "3.8"
-
+version: '3.8'
 services:
-  registry:
-    image: openjdk:17
-    container_name: rmi-registry
-    command: rmiregistry
-    working_dir: /app
-    volumes:
-      - ./interfaceCode:/app
-    networks:
-      - rmi-net
-
   server:
     build:
-      context: ./serverCode
-    container_name: rmi-server
-    working_dir: /app/serverCode
-    volumes:
-      - ./serverCode:/app/serverCode
-      - ./interfaceCode:/app/interfaceCode
-    command: ["bash", "entrypoint.sh"]
-    depends_on:
-      - registry
+      context: .
+      dockerfile: serverCode/Dockerfile
+    container_name: server
+    ports:
+      - "1099:1099"
     networks:
-      - rmi-net
+      - rmi-network
+    environment:
+      - JAVA_OPTS=-Dfile.encoding=UTF-8
+    # Remove volumes section if not needed
 
   client:
     build:
-      context: ./clientCode
-    container_name: rmi-client
-    working_dir: /app/clientCode
-    volumes:
-      - ./clientCode:/app/clientCode
-      - ./interfaceCode:/app/interfaceCode
-    command: ["bash", "/app/entrypoint.sh"]
+      context: .
+      dockerfile: clientCode/Dockerfile
+    container_name: client
     depends_on:
       - server
+    stdin_open: true
+    tty: true
+    environment:
+      - JAVA_OPTS=-Dfile.encoding=UTF-8
     networks:
-      - rmi-net
+      - rmi-network
+    # Remove volumes section if not needed
 
 networks:
-  rmi-net:
+  rmi-network:
+    driver: bridge
